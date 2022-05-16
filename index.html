@@ -1,0 +1,91 @@
+<head>
+    <style>
+        html, body, main {
+            width: 100%;
+            height: 100%;
+        }
+        main {
+            font-family: monospace;
+            font-size: 20px;
+            white-space: pre;
+        }
+    </style>  
+	<script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+	<script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.1/dist/index.min.js"></script>
+</head>
+
+        "species_id"
+<body>
+  <main id="main"></main><!-- This element is where the view will render -->
+  <script src="/_global_/customview/v1/omniscope.js"></script><!-- Add the Omniscope custom view API -->
+  <script>
+      if (!omniscope || !omniscope.view) throw new Error("Omniscope chart API is not loaded");
+      omniscope.view.on("load", function() {
+          window.onerror = function(msg) {
+              omniscope.view.error(msg);
+          }
+      });
+      document.body.addEventListener("click", function() {
+          omniscope.view.whitespaceClick();
+      });
+      omniscope.view.on(["load", "update", "resize"], function() {
+          var records = omniscope.view.context().result.data.records;
+          var mappings = omniscope.view.context().result.mappings;
+
+          // Map records to field options
+          var rows = [];
+          records.forEach(function(record) {
+              rows.push({
+                  sepal_length: (mappings.sepal_length !== undefined) ? record[mappings.sepal_length] : null,
+                  sepal_width: (mappings.sepal_width !== undefined) ? record[mappings.sepal_width] : null,
+                  petal_length: (mappings.petal_length !== undefined) ? record[mappings.petal_length] : null,
+                  petal_width: (mappings.petal_width !== undefined) ? record[mappings.petal_width] : null,
+                  species: (mappings.species !== undefined) ? record[mappings.species] : null,
+                  species_id: (mappings.species_id !== undefined) ? record[mappings.species_id] : null
+              });
+          });       
+          console.log(rows);
+        
+function unpack(rows, key) {
+  return rows.map(function(row) {
+    return row[key];
+  });
+}
+
+var data = [{
+  type: 'parcoords',
+  pad: [80,80,80,80],
+  line: {
+    color: unpack(rows, 'species_id'),
+    colorscale: [[0, 'red'], [0.5, 'green'], [1, 'blue']]
+  },
+
+  dimensions: [{
+    range: [2, 4.5],
+    label: 'sepal_width',
+    values: unpack(rows, 'sepal_width')
+  }, {
+    constraintrange: [5, 6],
+    range: [4,8],
+    label: 'sepal_length',
+    values: unpack(rows, 'sepal_length')
+  }, {
+    label: 'petal_width',
+    range: [0, 2.5],
+    values: unpack(rows, 'petal_width')
+  }, {
+    label: 'petal_length',
+    range: [1, 7],
+    values: unpack(rows, 'petal_length')
+  }]
+}];
+
+var layout = {
+
+};
+
+Plotly.newPlot('main', data, layout);
+
+});
+</script>  
